@@ -51,6 +51,8 @@ import {
 import { DetailsPane } from './PropertiesPanelContent/DetailsPane'
 import OverviewPane from './PropertiesPanelContent/OverviewPane'
 
+import * as editor from '../../../../../shared/modules/editor/editorDuck'
+
 type VisualizationState = {
   updated: number
   nodes: BasicNode[]
@@ -229,6 +231,35 @@ LIMIT ${maxNewNeighbours}`
     })
   }
 
+  deleteNode(id?: string) {
+    const query = `MATCH (node) WHERE id(node) = ${id} detach delete node`
+    // this.props.bus && this.props.bus.send(editor.SET_CONTENT, editor.setContent(query))
+    return new Promise(resolve => {
+      this.props.bus &&
+        this.props.bus.self(
+          CYPHER_REQUEST,
+          {
+            query,
+            queryType: NEO4J_BROWSER_USER_ACTION_QUERY
+          },
+          (response: any) => {
+            if (!response.success) {
+              console.error(response.error)
+              resolve({ nodes: [], relationships: [] })
+            } else {
+              resolve({
+                ...bolt.extractNodesAndRelationshipsFromRecordsForOldVis(
+                  response.result.records,
+                  false,
+                  this.props.maxFieldItems
+                )
+              })
+            }
+          }
+        )
+    })
+  }
+
   getInternalRelationships(
     rawExistingNodeIds: number[],
     rawNewNodeIds: number[]
@@ -282,6 +313,7 @@ LIMIT ${maxNewNeighbours}`
           graphStyleData={this.props.graphStyleData}
           updateStyle={this.props.updateStyle}
           getNeighbours={this.getNeighbours.bind(this)}
+          deleteNode={this.deleteNode.bind(this)}
           nodes={this.state.nodes}
           autocompleteRelationships={this.props.autoComplete ?? false}
           relationships={this.state.relationships}

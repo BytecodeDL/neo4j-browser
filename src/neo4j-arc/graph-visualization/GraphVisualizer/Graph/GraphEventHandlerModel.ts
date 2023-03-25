@@ -20,6 +20,12 @@
 
 import { GraphModel } from '../../models/Graph'
 import { NodeModel } from '../../models/Node'
+import React, { Dispatch } from 'react'
+import { withBus } from 'react-suber'
+import { Action } from 'redux'
+import { connect } from 'react-redux'
+
+import * as editor from '../../../../shared/modules/editor/editorDuck'
 import { RelationshipModel } from '../../models/Relationship'
 import { GetNodeNeighboursFn, VizItem } from '../../types'
 import {
@@ -29,6 +35,7 @@ import {
   mapRelationships
 } from '../../utils/mapper'
 import { Visualization } from './visualization/Visualization'
+import { executeCommand } from '../../../../shared/modules/commands/commandsDuck'
 
 export type GraphInteraction =
   | 'NODE_EXPAND'
@@ -49,6 +56,7 @@ export class GraphEventHandlerModel {
   onItemSelected: (item: VizItem) => void
   onGraphInteraction: GraphInteractionCallBack
   selectedItem: NodeModel | RelationshipModel | null
+  deleteNode: (id: string) => void
 
   constructor(
     graph: GraphModel,
@@ -57,6 +65,7 @@ export class GraphEventHandlerModel {
     onItemMouseOver: (item: VizItem) => void,
     onItemSelected: (item: VizItem) => void,
     onGraphModelChange: (stats: GraphStats) => void,
+    deleteNode: (id: string) => void,
     onGraphInteraction?: (event: GraphInteraction) => void
   ) {
     this.graph = graph
@@ -68,6 +77,8 @@ export class GraphEventHandlerModel {
     this.onGraphInteraction = onGraphInteraction ?? (() => undefined)
 
     this.onGraphModelChange = onGraphModelChange
+
+    this.deleteNode = deleteNode
   }
 
   graphModelChanged(): void {
@@ -120,6 +131,11 @@ export class GraphEventHandlerModel {
     })
     this.graphModelChanged()
     this.onGraphInteraction('NODE_DISMISSED')
+  }
+
+  nodeDelete(d: NodeModel): void {
+    this.nodeClose(d)
+    this.deleteNode(d.id)
   }
 
   nodeClicked(node: NodeModel): void {
@@ -246,6 +262,7 @@ export class GraphEventHandlerModel {
       .on('relationshipClicked', this.onRelationshipClicked.bind(this))
       .on('canvasClicked', this.onCanvasClicked.bind(this))
       .on('nodeClose', this.nodeClose.bind(this))
+      .on('nodeDelete', this.nodeDelete.bind(this))
       .on('nodeClicked', this.nodeClicked.bind(this))
       .on('nodeDblClicked', this.nodeDblClicked.bind(this))
       .on('nodeUnlock', this.nodeUnlock.bind(this))

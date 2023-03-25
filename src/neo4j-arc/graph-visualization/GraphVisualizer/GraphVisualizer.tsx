@@ -85,6 +85,7 @@ type GraphVisualizerProps = GraphVisualizerDefaultProps & {
   onGraphInteraction?: GraphInteractionCallBack
   useGeneratedDefaultColors?: boolean
   autocompleteRelationships: boolean
+  deleteNode: (id: string) => void
 }
 
 type GraphVisualizerState = {
@@ -259,6 +260,7 @@ export class GraphVisualizer extends Component<
           relationships={this.state.relationships}
           nodes={this.state.nodes}
           getNodeNeighbours={this.getNodeNeighbours.bind(this)}
+          deleteNode={this.props.deleteNode}
           onItemMouseOver={this.onItemMouseOver.bind(this)}
           onItemSelect={this.onItemSelect.bind(this)}
           graphStyle={graphStyle}

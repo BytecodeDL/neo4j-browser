@@ -59,6 +59,7 @@ export type GraphProps = {
   onItemSelect: (item: VizItem) => void
   graphStyle: GraphStyleModel
   styleVersion: number
+  deleteNode: (id: string) => void
   onGraphModelChange: (stats: GraphStats) => void
   assignVisElement: (svgElement: any, graphElement: any) => void
   autocompleteRelationships: boolean
@@ -123,7 +124,8 @@ export class Graph extends React.Component<GraphProps, GraphState> {
       onItemSelect,
       relationships,
       setGraph,
-      wheelZoomRequiresModKey
+      wheelZoomRequiresModKey,
+      deleteNode
     } = this.props
 
     if (!this.svgElement.current) return
@@ -153,6 +155,7 @@ export class Graph extends React.Component<GraphProps, GraphState> {
       onItemMouseOver,
       onItemSelect,
       onGraphModelChange,
+      deleteNode,
       onGraphInteraction
     )
     graphEventHandler.bindEventHandlers()

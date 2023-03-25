@@ -27,7 +27,7 @@ import icons from './d3Icons'
 
 const noOp = () => undefined
 
-const numberOfItemsInContextMenu = 3
+const numberOfItemsInContextMenu = 4
 
 const drawArc = function (radius: number, itemNumber: number, width = 30) {
   const startAngle =
@@ -85,7 +85,7 @@ const createMenuItem = function (
   itemIndex: number,
   className: string,
   position: [number, number],
-  svgIconKey: 'Expand / Collapse' | 'Unlock' | 'Remove',
+  svgIconKey: 'Expand / Collapse' | 'Unlock' | 'Remove' | 'Delete',
   tooltip: string
 ) {
   const tab = selection
@@ -168,6 +168,24 @@ const donutRemoveNode = new Renderer<NodeModel>({
   onTick: noOp
 })
 
+const donutDeleteNode = new Renderer<NodeModel>({
+  name: 'donutDeleteNode',
+  onGraphChange(selection, viz) {
+    return createMenuItem(
+      selection,
+      viz,
+      'nodeDelete',
+      4,
+      'delete-node',
+      [-6, -10],
+      'Delete',
+      'Delete'
+    )
+  },
+
+  onTick: noOp
+})
+
 const donutExpandNode = new Renderer<NodeModel>({
   name: 'donutExpandNode',
   onGraphChange(selection, viz) {
@@ -207,5 +225,6 @@ const donutUnlockNode = new Renderer<NodeModel>({
 export const nodeMenuRenderer = [
   donutExpandNode,
   donutRemoveNode,
-  donutUnlockNode
+  donutUnlockNode,
+  donutDeleteNode
 ]
