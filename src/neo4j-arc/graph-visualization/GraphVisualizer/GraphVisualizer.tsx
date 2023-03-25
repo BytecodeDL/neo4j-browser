@@ -64,7 +64,8 @@ type GraphVisualizerProps = GraphVisualizerDefaultProps & {
   graphStyleData?: any
   getNeighbours?: (
     id: string,
-    currentNeighbourIds: string[] | undefined
+    currentNeighbourIds: string[] | undefined,
+    direction: string
   ) => Promise<BasicNodesAndRels & { allNeighboursCount: number }>
   updateStyle?: (style: any) => void
   isFullscreen?: boolean
@@ -173,13 +174,14 @@ export class GraphVisualizer extends Component<
   getNodeNeighbours: GetNodeNeighboursFn = (
     node,
     currentNeighbourIds,
-    callback
+    callback,
+    direction
   ) => {
     if (currentNeighbourIds.length > this.props.maxNeighbours) {
       callback({ nodes: [], relationships: [] })
     }
     if (this.props.getNeighbours) {
-      this.props.getNeighbours(node.id, currentNeighbourIds).then(
+      this.props.getNeighbours(node.id, currentNeighbourIds, direction).then(
         ({ nodes, relationships, allNeighboursCount }) => {
           if (allNeighboursCount > this.props.maxNeighbours) {
             this.setState({

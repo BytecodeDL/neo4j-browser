@@ -74,5 +74,6 @@ export enum ZoomType {
 export type GetNodeNeighboursFn = (
   node: BasicNode | NodeModel,
   currentNeighbourIds: string[],
-  callback: (data: BasicNodesAndRels) => void
+  callback: (data: BasicNodesAndRels) => void,
+  direction: string
 ) => void

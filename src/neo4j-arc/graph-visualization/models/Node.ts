@@ -40,7 +40,8 @@ export class NodeModel {
   radius: number
   caption: NodeCaptionLine[]
   selected: boolean
-  expanded: boolean
+  forwardExpanded: boolean
+  backwardExpanded: boolean
   minified: boolean
   contextMenu?: { menuSelection: string; menuContent: string; label: string }
 
@@ -70,7 +71,8 @@ export class NodeModel {
     this.radius = 0
     this.caption = []
     this.selected = false
-    this.expanded = false
+    this.forwardExpanded = false
+    this.backwardExpanded = false
     this.minified = false
     this.x = 0
     this.y = 0

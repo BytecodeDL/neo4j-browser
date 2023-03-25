@@ -27,7 +27,7 @@ import icons from './d3Icons'
 
 const noOp = () => undefined
 
-const numberOfItemsInContextMenu = 4
+const numberOfItemsInContextMenu = 5
 
 const drawArc = function (radius: number, itemNumber: number, width = 30) {
   const startAngle =
@@ -85,7 +85,7 @@ const createMenuItem = function (
   itemIndex: number,
   className: string,
   position: [number, number],
-  svgIconKey: 'Expand / Collapse' | 'Unlock' | 'Remove' | 'Delete',
+  svgIconKey: 'Forward' | 'Unlock' | 'Remove' | 'Delete' | 'Backward',
   tooltip: string
 ) {
   const tab = selection
@@ -186,18 +186,38 @@ const donutDeleteNode = new Renderer<NodeModel>({
   onTick: noOp
 })
 
-const donutExpandNode = new Renderer<NodeModel>({
-  name: 'donutExpandNode',
+// 找到前向结点
+const donutForwardNode = new Renderer<NodeModel>({
+  name: 'donutForwardNode',
   onGraphChange(selection, viz) {
     return createMenuItem(
       selection,
       viz,
       'nodeDblClicked',
       2,
-      'expand-node',
+      'find-forward-node',
       [-8, -10],
-      'Expand / Collapse',
-      'Expand / Collapse child relationships'
+      'Forward',
+      'Find forWard nodes'
+    )
+  },
+
+  onTick: noOp
+})
+
+// 找到后继结点
+const donutBackwardNode = new Renderer<NodeModel>({
+  name: 'donutBackwardNode',
+  onGraphChange(selection, viz) {
+    return createMenuItem(
+      selection,
+      viz,
+      'nodeGetBackwardNodes',
+      5,
+      'find-backward-node',
+      [-2, -9],
+      'Backward',
+      'Find backward nodes'
     )
   },
 
@@ -223,8 +243,9 @@ const donutUnlockNode = new Renderer<NodeModel>({
 })
 
 export const nodeMenuRenderer = [
-  donutExpandNode,
+  donutForwardNode,
   donutRemoveNode,
   donutUnlockNode,
-  donutDeleteNode
+  donutDeleteNode,
+  donutBackwardNode
 ]

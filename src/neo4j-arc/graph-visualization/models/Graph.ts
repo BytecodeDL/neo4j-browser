@@ -122,7 +122,8 @@ export class GraphModel {
   updateNode(node: NodeModel): void {
     if (this.findNode(node.id) != null) {
       this.removeNode(node)
-      node.expanded = false
+      node.forwardExpanded = false
+      node.backwardExpanded = false
       node.minified = true
       this.addNodes([node])
     }

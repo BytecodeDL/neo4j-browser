@@ -165,13 +165,17 @@ export class GraphEventHandlerModel {
     this.deselectItem()
     this.onGraphInteraction('NODE_UNPINNED')
   }
-
+  /**
+   * 获取前置结点
+   * @param d node
+   * @returns
+   */
   nodeDblClicked(d: NodeModel): void {
-    if (d.expanded) {
-      this.nodeCollapse(d)
+    if (d.forwardExpanded) {
+      this.nodeCollapse(d, 'forwardExpanded')
       return
     }
-    d.expanded = true
+    d.forwardExpanded = true
     const graph = this.graph
     const visualization = this.visualization
     const graphModelChanged = this.graphModelChanged.bind(this)
@@ -183,13 +187,45 @@ export class GraphEventHandlerModel {
         graph.addRelationships(mapRelationships(relationships, graph))
         visualization.update({ updateNodes: true, updateRelationships: true })
         graphModelChanged()
-      }
+      },
+      '-->'
     )
     this.onGraphInteraction('NODE_EXPAND')
   }
 
-  nodeCollapse(d: NodeModel): void {
-    d.expanded = false
+  /**
+   *
+   * @param d 获取后置结点
+   */
+  nodeGetBackwardNodes(d: NodeModel): void {
+    if (d.backwardExpanded) {
+      this.nodeCollapse(d, 'backwardExpanded')
+      return
+    }
+    d.backwardExpanded = true
+    const graph = this.graph
+    const visualization = this.visualization
+    const graphModelChanged = this.graphModelChanged.bind(this)
+    this.getNodeNeighbours(
+      d,
+      this.graph.findNodeNeighbourIds(d.id),
+      ({ nodes, relationships }) => {
+        graph.addExpandedNodes(d, mapNodes(nodes))
+        graph.addRelationships(mapRelationships(relationships, graph))
+        visualization.update({ updateNodes: true, updateRelationships: true })
+        graphModelChanged()
+      },
+      '<--'
+    )
+    this.onGraphInteraction('NODE_EXPAND')
+  }
+
+  nodeCollapse(d: NodeModel, status: string): void {
+    if (status === 'backwardExpanded') {
+      d.backwardExpanded = false
+    } else {
+      d.forwardExpanded = false
+    }
     this.graph.collapseNode(d)
     this.visualization.update({ updateNodes: true, updateRelationships: true })
     this.graphModelChanged()
@@ -265,6 +301,7 @@ export class GraphEventHandlerModel {
       .on('nodeDelete', this.nodeDelete.bind(this))
       .on('nodeClicked', this.nodeClicked.bind(this))
       .on('nodeDblClicked', this.nodeDblClicked.bind(this))
+      .on('nodeGetBackwardNodes', this.nodeGetBackwardNodes.bind(this))
       .on('nodeUnlock', this.nodeUnlock.bind(this))
     this.onItemMouseOut()
   }

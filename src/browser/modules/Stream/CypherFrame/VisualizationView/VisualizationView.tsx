@@ -181,7 +181,8 @@ export class Visualization extends Component<
 
   getNeighbours(
     id: string,
-    currentNeighbourIds: string[] = []
+    currentNeighbourIds: string[] = [],
+    direction = '-->'
   ): Promise<BasicNodesAndRels & { allNeighboursCount: number }> {
     const maxNewNeighbours =
       this.props.maxNeighbours - currentNeighbourIds.length
@@ -189,12 +190,14 @@ export class Visualization extends Component<
     const query =
       maxNewNeighbours > 0
         ? `MATCH (a) WHERE id(a) = ${id}
-WITH a, size([(a)--() | 1]) AS allNeighboursCount
-MATCH path = (a)--(o) WHERE NOT id(o) IN [${currentNeighbourIds.join(',')}]
+WITH a, size([(a)${direction}() | 1]) AS allNeighboursCount
+MATCH path = (a)${direction}(o) WHERE NOT id(o) IN [${currentNeighbourIds.join(
+            ','
+          )}]
 RETURN path, allNeighboursCount
 ORDER BY id(o)
 LIMIT ${maxNewNeighbours}`
-        : `MATCH p=(a)--() WHERE id(a) = ${id} RETURN count(p) as allNeighboursCount`
+        : `MATCH p=(a)${direction}() WHERE id(a) = ${id} RETURN count(p) as allNeighboursCount`
 
     return new Promise((resolve, reject) => {
       this.props.bus &&
